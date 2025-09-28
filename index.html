@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeRush | Typing Speed Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d1b69, #1a0f3d);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fecfef;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .text-display {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            min-height: 150px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .char {
+            position: relative;
+        }
+
+        .char.correct {
+            background-color: rgba(192, 192, 192, 0.3);
+            color: #c0c0c0;
+        }
+
+        .char.incorrect {
+            background-color: rgba(255, 0, 0, 0.3);
+            color: #ff4444;
+            text-decoration: underline;
+            text-decoration-color: red;
+        }
+
+        .char.current {
+            background-color: #ff9a9e;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .input-area {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: white;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            margin-bottom: 30px;
+            resize: none;
+        }
+
+        .input-area:focus {
+            border-color: #ff9a9e;
+            box-shadow: 0 0 20px rgba(255, 154, 158, 0.3);
+        }
+
+        .input-area::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d1b69;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+            min-width: 120px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .results h2 {
+            color: #fecfef;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff9a9e;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+            
+            .text-display {
+                font-size: 1rem;
+                padding: 20px;
+            }
+            
+            .input-area {
+                font-size: 1rem;
+                padding: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Typing Speed Test</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">WPM</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracy">100%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="timer">0s</div>
+                <div class="stat-label">Time Elapsed</div>
+            </div>
+        </div>
+
+        <div class="text-display" id="textDisplay"></div>
+
+        <textarea 
+            class="input-area" 
+            id="inputArea" 
+            placeholder="Click 'Start Test' to begin typing..."
+            disabled
+            rows="4"
+        ></textarea>
+
+        <div class="buttons">
+            <button id="startBtn">Start Test</button>
+            <button id="restartBtn" class="hidden">Restart</button>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Test Complete!</h2>
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-value" id="finalWpm">0</div>
+                    <div class="result-label">Words Per Minute</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="finalAccuracy">0%</div>
+                    <div class="result-label">Accuracy</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="finalTime">0s</div>
+                    <div class="result-label">Time Taken</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TypingTest {
+            constructor() {
+                this.passages = [
+                    "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet at least once, making it perfect for typing practice.",
+                    "In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole filled with the ends of worms and an oozy smell, nor yet a dry, bare, sandy hole.",
+                    "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity.",
+                    "To be or not to be, that is the question. Whether 'tis nobler in the mind to suffer the slings and arrows of outrageous fortune, or to take arms against a sea of troubles.",
+                    "Space: the final frontier. These are the voyages of the starship Enterprise. Its continuing mission: to explore strange new worlds, to seek out new life and new civilizations.",
+                    "All happy families are alike; each unhappy family is unhappy in its own way. Everything was in confusion in the Oblonskys' house. The wife had discovered that the husband was unfaithful.",
+                    "Call me Ishmael. Some years ago, never mind how long precisely, having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about.",
+                    "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be."
+                ];
+
+                this.currentText = "";
+                this.currentIndex = 0;
+                this.startTime = null;
+                this.endTime = null;
+                this.timerInterval = null;
+                this.timeElapsed = 0;
+                this.testActive = false;
+                this.errors = 0;
+                this.totalTyped = 0;
+
+                this.initElements();
+                this.bindEvents();
+                this.loadNewText();
+            }
+
+            initElements() {
+                this.textDisplay = document.getElementById('textDisplay');
+                this.inputArea = document.getElementById('inputArea');
+                this.startBtn = document.getElementById('startBtn');
+                this.restartBtn = document.getElementById('restartBtn');
+                this.wpmDisplay = document.getElementById('wpm');
+                this.accuracyDisplay = document.getElementById('accuracy');
+                this.timerDisplay = document.getElementById('timer');
+                this.results = document.getElementById('results');
+                this.finalWpm = document.getElementById('finalWpm');
+                this.finalAccuracy = document.getElementById('finalAccuracy');
+                this.finalTime = document.getElementById('finalTime');
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startTest());
+                this.restartBtn.addEventListener('click', () => this.restartTest());
+                this.inputArea.addEventListener('input', (e) => this.handleInput(e));
+                this.inputArea.addEventListener('paste', (e) => e.preventDefault());
+            }
+
+            loadNewText() {
+                const randomIndex = Math.floor(Math.random() * this.passages.length);
+                this.currentText = this.passages[randomIndex];
+                this.displayText();
+            }
+
+            displayText() {
+                const chars = this.currentText.split('');
+                this.textDisplay.innerHTML = chars.map((char, index) => 
+                    `<span class="char" data-index="${index}">${char}</span>`
+                ).join('');
+            }
+
+            startTest() {
+                this.testActive = true;
+                this.startTime = new Date();
+                this.currentIndex = 0;
+                this.errors = 0;
+                this.totalTyped = 0;
+                this.timeElapsed = 0;
+                
+                this.inputArea.disabled = false;
+                this.inputArea.placeholder = "Start typing here...";
+                this.inputArea.focus();
+                this.inputArea.value = "";
+                
+                this.startBtn.classList.add('hidden');
+                this.restartBtn.classList.remove('hidden');
+                this.results.classList.remove('show');
+                
+                this.startTimer();
+                this.updateCurrentChar();
+            }
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    this.timeElapsed++;
+                    this.timerDisplay.textContent = `${this.timeElapsed}s`;
+                }, 1000);
+            }
+
+            handleInput(e) {
+                if (!this.testActive) return;
+
+                const inputValue = e.target.value;
+                const inputLength = inputValue.length;
+                
+                this.totalTyped = inputLength;
+                this.updateDisplay(inputValue);
+                this.updateStats();
+                
+                // Check if test is complete
+                if (inputLength >= this.currentText.length) {
+                    this.endTest();
+                }
+            }
+
+            updateDisplay(inputValue) {
+                const chars = document.querySelectorAll('.char');
+                this.errors = 0;
+                
+                chars.forEach((char, index) => {
+                    char.classList.remove('correct', 'incorrect', 'current');
+                    
+                    if (index < inputValue.length) {
+                        if (inputValue[index] === this.currentText[index]) {
+                            char.classList.add('correct');
+                        } else {
+                            char.classList.add('incorrect');
+                            this.errors++;
+                        }
+                    } else if (index === inputValue.length) {
+                        char.classList.add('current');
+                    }
+                });
+            }
+
+            updateCurrentChar() {
+                const chars = document.querySelectorAll('.char');
+                chars.forEach(char => char.classList.remove('current'));
+                
+                if (this.currentIndex < chars.length) {
+                    chars[this.currentIndex].classList.add('current');
+                }
+            }
+
+            updateStats() {
+                // Calculate WPM
+                const timeElapsed = (new Date() - this.startTime) / 1000 / 60; // in minutes
+                const wordsTyped = this.totalTyped / 5; // average word length is 5 characters
+                const wpm = timeElapsed > 0 ? Math.round(wordsTyped / timeElapsed) : 0;
+                
+                // Calculate accuracy
+                const accuracy = this.totalTyped > 0 ? Math.round(((this.totalTyped - this.errors) / this.totalTyped) * 100) : 100;
+                
+                this.wpmDisplay.textContent = wpm;
+                this.accuracyDisplay.textContent = `${accuracy}%`;
+            }
+
+            endTest() {
+                this.testActive = false;
+                this.endTime = new Date();
+                
+                clearInterval(this.timerInterval);
+                this.inputArea.disabled = true;
+                
+                this.showResults();
+            }
+
+            showResults() {
+                const totalTime = (this.endTime - this.startTime) / 1000;
+                const wordsTyped = this.totalTyped / 5;
+                const wpm = Math.round(wordsTyped / (totalTime / 60));
+                const accuracy = this.totalTyped > 0 ? Math.round(((this.totalTyped - this.errors) / this.totalTyped) * 100) : 100;
+                
+                this.finalWpm.textContent = wpm;
+                this.finalAccuracy.textContent = `${accuracy}%`;
+                this.finalTime.textContent = `${Math.round(totalTime)}s`;
+                
+                this.results.classList.add('show');
+            }
+
+            restartTest() {
+                this.testActive = false;
+                clearInterval(this.timerInterval);
+                
+                this.currentIndex = 0;
+                this.errors = 0;
+                this.totalTyped = 0;
+                this.timeElapsed = 0;
+                this.startTime = null;
+                this.endTime = null;
+                
+                this.inputArea.disabled = true;
+                this.inputArea.placeholder = "Click 'Start Test' to begin typing...";
+                this.inputArea.value = "";
+                
+                this.startBtn.classList.remove('hidden');
+                this.restartBtn.classList.add('hidden');
+                this.results.classList.remove('show');
+                
+                this.wpmDisplay.textContent = "0";
+                this.accuracyDisplay.textContent = "100%";
+                this.timerDisplay.textContent = "0s";
+                
+                this.loadNewText();
+            }
+        }
+
+        // Initialize the typing test when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TypingTest();
+        });
+    </script>
+</body>
+</html>
